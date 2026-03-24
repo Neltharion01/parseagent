@@ -35,6 +35,18 @@ pub enum Engine {
     Unknown(String),
 }
 
+impl Engine {
+    fn is_empty(&self) -> bool {
+        match self {
+            Engine::Unknown(s) => s.is_empty(),
+            _ => false,
+        }
+    }
+    fn is_unknown(&self) -> bool {
+        matches!(self, Engine::Unknown(_))
+    }
+}
+
 impl Default for Engine {
     fn default() -> Engine {
         Engine::Unknown("".to_string())
@@ -167,8 +179,11 @@ impl Guess {
 
 impl fmt::Display for Guess {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{} {}", self.os, self.engine)?;
-        if !self.ver.is_empty() && !matches!(self.engine, Engine::Unknown(_)) {
+        write!(f, "{}", self.os)?;
+        if !self.engine.is_empty() {
+            write!(f, " {}", self.engine)?;
+        }
+        if !self.ver.is_empty() && !self.engine.is_unknown() {
             write!(f, "/{}", self.ver)?;
         }
         Ok(())
